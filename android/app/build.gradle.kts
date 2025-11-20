@@ -45,6 +45,20 @@ android {
     }
 }
 
+configurations {
+    getByName("debugImplementation") {
+        exclude(group = "io.objectbox", module = "objectbox-android")
+    }
+}
+
+val objectboxVersion = "4.1.0"
+
+dependencies {
+    debugImplementation("io.objectbox:objectbox-android-objectbrowser:$objectboxVersion") {
+        exclude(group = "io.objectbox", module = "objectbox-android")
+    }
+}
+
 flutter {
     source = "../.."
 }
