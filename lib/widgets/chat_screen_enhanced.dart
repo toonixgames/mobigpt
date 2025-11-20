@@ -23,11 +23,13 @@ class ChatScreenEnhanced extends StatefulWidget {
     this.model = Model.gemma3_1B,
     this.selectedBackend,
     required this.chatService,
+    required this.ratingService
   });
 
   final Model model;
   final PreferredBackend? selectedBackend;
   final ChatService chatService;
+  final RatingService ratingService;
 
   @override
   ChatScreenEnhancedState createState() => ChatScreenEnhancedState();
@@ -35,8 +37,8 @@ class ChatScreenEnhanced extends StatefulWidget {
 
 class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   final _gemma = FlutterGemmaPlugin.instance;
-  final _ratingService = RatingService();
   late final ChatService _chatService;
+  late final RatingService _ratingService;
 
   InferenceChat? chat;
   Chat? _currentChat;
@@ -55,6 +57,7 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   void initState() {
     super.initState();
     _chatService = widget.chatService;
+    _ratingService = widget.ratingService;
     _currentModel = widget.model;
     _currentBackend = widget.selectedBackend ?? PreferredBackend.cpu;
     _useGPU = _currentBackend == PreferredBackend.gpu;

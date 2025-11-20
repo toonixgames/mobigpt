@@ -6,12 +6,10 @@ import 'package:mobigpt/data/objectbox/objectbox_store.dart';
 import 'package:mobigpt/models/model.dart';
 import 'package:mobigpt/services/chat_service.dart';
 import 'package:mobigpt/services/model_download_service.dart';
+import 'package:mobigpt/services/rating_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobigpt/utils/logger.dart';
 import 'package:mobigpt/widgets/chat_screen_enhanced.dart';
-
-import 'db/DBConfig.dart';
-import 'db/objectBoxDB.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,8 +21,10 @@ void main() async {
   final chatService = ChatService(
     chatRepository: objectBoxStore.chatRepository,
   );
-
-  runApp(ChatApp(chatService: chatService));
+  final ratingService = RatingService(
+    ratingRepository: objectBoxStore.ratingRepository,
+  );
+  runApp(ChatApp(chatService: chatService, ratingService: ratingService,));
 }
 
 // Request storage permissions for external storage access
@@ -58,9 +58,10 @@ Future<void> _requestStoragePermissions() async {
 }
 
 class ChatApp extends StatelessWidget {
-  const ChatApp({super.key, required this.chatService});
+  const ChatApp({super.key, required this.chatService, required this.ratingService});
 
   final ChatService chatService;
+  final RatingService ratingService;
 
   // Get the first available model based on platform and existence check
   Future<Model> _getFirstAvailableModel() async {
@@ -134,6 +135,7 @@ class ChatApp extends StatelessWidget {
                 child: ChatScreenEnhanced(
                   model: snapshot.data!,
                   chatService: chatService,
+                  ratingService: ratingService,
                 ),
               );
             } else {

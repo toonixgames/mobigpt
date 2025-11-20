@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:mobigpt/repositories/rating_repository.dart';
 import 'package:rate_popup/rate_popup.dart';
-
-import '../db/objectBoxDB.dart';
 import '../theme/appColors.dart';
 
 /// Service to manage ratings
 class RatingService {
+  RatingService({required RatingRepository ratingRepository})
+      : _ratingRepository = ratingRepository;
+
+  final RatingRepository _ratingRepository;
 
   void showRatingDialog(BuildContext context) async {
     // the Rating object returned from the RatingDialog widget
@@ -28,7 +31,7 @@ class RatingService {
     );
 
     if(rating != null) {
-      ObjectBoxDB.instance.putRating(rating);
+      _ratingRepository.addRating(rating);
     }
   }
 
