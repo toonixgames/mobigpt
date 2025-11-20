@@ -15,6 +15,8 @@ import 'package:mobigpt/theme/appColors.dart';
 import 'package:mobigpt/theme/appImages.dart';
 import 'package:mobigpt/utils/logger.dart';
 
+import '../services/rating_service.dart';
+
 class ChatScreenEnhanced extends StatefulWidget {
   const ChatScreenEnhanced({super.key, this.model = Model.gemma3_1B, this.selectedBackend});
 
@@ -28,6 +30,7 @@ class ChatScreenEnhanced extends StatefulWidget {
 class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   final _gemma = FlutterGemmaPlugin.instance;
   final _chatService = ChatService();
+  final _ratingService = RatingService();
 
   InferenceChat? chat;
   Chat? _currentChat;
@@ -953,6 +956,7 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
       ),
       drawer: SidebarWidget(
         chatService: _chatService,
+        ratingService: _ratingService,
         currentChatId: _currentChat?.id,
         onChatSelected: _onChatSelectedFromSidebar,
         onChatDeleted: _handleChatDeleted,

@@ -5,6 +5,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+configurations {
+    named("debugImplementation") {
+        exclude(group = "io.objectbox", module = "objectbox-android")
+    }
+}
+
 android {
     namespace = "com.example.mobigpt"
     compileSdk = flutter.compileSdkVersion
@@ -36,6 +42,11 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+
+    dependencies {
+        // your existing deps...
+        debugImplementation("io.objectbox:objectbox-android-objectbrowser:4.0.3")
     }
 }
 

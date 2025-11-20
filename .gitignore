@@ -39,3 +39,6 @@ windows/build/
 *.tmp
 *.apk
 *.ipa
+
+# FVM Version Cache
+.fvm/

@@ -8,11 +8,19 @@ import 'package:mobigpt/services/model_download_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobigpt/utils/logger.dart';
 
+import 'db/DBConfig.dart';
+import 'db/objectBoxDB.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Request storage permissions at app startup
   await _requestStoragePermissions();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await DBConfig.init();
+  await ObjectBoxDB.instance.init();
 
   runApp(const ChatApp());
 }

@@ -84,4 +84,9 @@ class AppColors {
   static Color blackWithOpacity(double opacity) {
     return Colors.black.withOpacity(opacity);
   }
+
+  // ===== Rating =====
+  static const Color ratingLightTextField = const Color(0xFFEEEEEE);
+  static const Color ratingDarkTextField = const Color(0xFF424242);
+
 }
