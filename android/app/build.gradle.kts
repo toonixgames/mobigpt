@@ -41,12 +41,32 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
     dependencies {
         // your existing deps...
         debugImplementation("io.objectbox:objectbox-android-objectbrowser:4.0.3")
+    }
+}
+
+configurations {
+    getByName("debugImplementation") {
+        exclude(group = "io.objectbox", module = "objectbox-android")
+    }
+}
+
+val objectboxVersion = "4.1.0"
+
+dependencies {
+    debugImplementation("io.objectbox:objectbox-android-objectbrowser:$objectboxVersion") {
+        exclude(group = "io.objectbox", module = "objectbox-android")
     }
 }
 

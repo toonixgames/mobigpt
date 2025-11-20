@@ -70,7 +70,7 @@ class SidebarWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // New Chat Button
           Container(
             width: double.infinity,
@@ -80,7 +80,8 @@ class SidebarWidget extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: chatService.chats.length >= 10 ? null : onNewChat,
+                    onPressed:
+                        chatService.chats.length >= 10 ? null : onNewChat,
                     icon: const Icon(
                       Icons.add,
                       color: AppColors.textWhite,
@@ -94,10 +95,11 @@ class SidebarWidget extends StatelessWidget {
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: chatService.chats.length >= 10 
-                          ? AppColors.textGrey 
+                      backgroundColor: chatService.chats.length >= 10
+                          ? AppColors.textGrey
                           : AppColors.lightPrimary,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
@@ -109,7 +111,8 @@ class SidebarWidget extends StatelessWidget {
                 if (chatService.chats.length >= 10)
                   Container(
                     margin: const EdgeInsets.only(top: 8.0),
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 8.0),
                     decoration: BoxDecoration(
                       color: AppColors.warningLight,
                       borderRadius: BorderRadius.circular(6),
@@ -141,7 +144,7 @@ class SidebarWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Chat List
           Expanded(
             child: chatService.chats.isEmpty
@@ -152,7 +155,7 @@ class SidebarWidget extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final chat = chatService.chats[index];
                       final isSelected = chat.id == currentChatId;
-                      
+
                       return _buildChatItem(chat, isSelected);
                     },
                   ),
@@ -239,7 +242,8 @@ class SidebarWidget extends StatelessWidget {
           onTap: () => onChatSelected(chat.id),
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: isSelected
@@ -258,34 +262,41 @@ class SidebarWidget extends StatelessWidget {
                       Text(
                         chat.title,
                         style: TextStyle(
-                          color: isSelected ? AppColors.textSecondary : AppColors.textTertiary,
+                          color: isSelected
+                              ? AppColors.textSecondary
+                              : AppColors.textTertiary,
                           fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w500,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      
+
                       const SizedBox(height: 4),
-                      
+
                       // Last message preview
                       Text(
                         chat.lastMessagePreview,
                         style: TextStyle(
-                          color: isSelected ? AppColors.textTertiary : AppColors.textQuaternary,
+                          color: isSelected
+                              ? AppColors.textTertiary
+                              : AppColors.textQuaternary,
                           fontSize: 12,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      
+
                       const SizedBox(height: 4),
-                      
+
                       // Timestamp
                       Text(
                         _formatTimestamp(chat.updatedAt),
                         style: TextStyle(
-                          color: isSelected ? AppColors.textQuaternary : AppColors.textQuaternary,
+                          color: isSelected
+                              ? AppColors.textQuaternary
+                              : AppColors.textQuaternary,
                           fontSize: 11,
                         ),
                       ),
@@ -316,7 +327,7 @@ class SidebarWidget extends StatelessWidget {
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {
@@ -327,7 +338,6 @@ class SidebarWidget extends StatelessWidget {
       return 'Just now';
     }
   }
-
 
   void _showDeleteChatDialog(BuildContext context, Chat chat) {
     showDialog(
@@ -355,6 +365,7 @@ class SidebarWidget extends StatelessWidget {
               Navigator.of(context).pop();
               await chatService.deleteChat(chat.id);
               onChatDeleted(chat.id);
+              onClose();
             },
             child: const Text(
               'מחק',

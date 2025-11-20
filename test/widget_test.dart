@@ -5,22 +5,70 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mobigpt/main.dart';
+import 'package:mobigpt/models/chat.dart';
+import 'package:mobigpt/repositories/chat_repository.dart';
+import 'package:mobigpt/services/chat_service.dart';
 
 void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const ChatApp());
-
-    // Verify that platform version is retrieved.
-    expect(
-      find.byWidgetPredicate(
-            (Widget widget) => widget is Text && widget.data!.startsWith('Running on:'),
-      ),
-      findsOneWidget,
+  testWidgets('ChatApp renders loading state', (WidgetTester tester) async {
+    final chatService = ChatService(
+      chatRepository: _FakeChatRepository(),
     );
+
+    await tester.pumpWidget(ChatApp(chatService: chatService));
+
+    expect(find.text('בודק מודלים זמינים...'), findsOneWidget);
   });
+}
+
+class _FakeChatRepository implements ChatRepository {
+  final List<Chat> _chats = [];
+  String? _currentChatId;
+
+  @override
+  Future<void> clearChats() async {
+    _chats.clear();
+    _currentChatId = null;
+  }
+
+  @override
+  Future<void> deleteChat(String chatId) async {
+    _chats.removeWhere((chat) => chat.id == chatId);
+  }
+
+  @override
+  Future<List<Chat>> getAllChats() async {
+    return List<Chat>.from(_chats);
+  }
+
+  @override
+  Future<Chat?> getChatById(String chatId) async {
+    try {
+      return _chats.firstWhere((chat) => chat.id == chatId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> getCurrentChatId() async => _currentChatId;
+
+  @override
+  Future<void> setCurrentChatId(String? chatId) async {
+    _currentChatId = chatId;
+  }
+
+  @override
+  Future<Chat> upsertChat(Chat chat) async {
+    final index = _chats.indexWhere((element) => element.id == chat.id);
+    if (index != -1) {
+      _chats[index] = chat;
+    } else {
+      _chats.add(chat);
+    }
+    return chat;
+  }
 }

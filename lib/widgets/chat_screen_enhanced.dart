@@ -18,10 +18,16 @@ import 'package:mobigpt/utils/logger.dart';
 import '../services/rating_service.dart';
 
 class ChatScreenEnhanced extends StatefulWidget {
-  const ChatScreenEnhanced({super.key, this.model = Model.gemma3_1B, this.selectedBackend});
+  const ChatScreenEnhanced({
+    super.key,
+    this.model = Model.gemma3_1B,
+    this.selectedBackend,
+    required this.chatService,
+  });
 
   final Model model;
   final PreferredBackend? selectedBackend;
+  final ChatService chatService;
 
   @override
   ChatScreenEnhancedState createState() => ChatScreenEnhancedState();
@@ -29,8 +35,8 @@ class ChatScreenEnhanced extends StatefulWidget {
 
 class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   final _gemma = FlutterGemmaPlugin.instance;
-  final _chatService = ChatService();
   final _ratingService = RatingService();
+  late final ChatService _chatService;
 
   InferenceChat? chat;
   Chat? _currentChat;
@@ -48,6 +54,7 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   @override
   void initState() {
     super.initState();
+    _chatService = widget.chatService;
     _currentModel = widget.model;
     _currentBackend = widget.selectedBackend ?? PreferredBackend.cpu;
     _useGPU = _currentBackend == PreferredBackend.gpu;
@@ -194,85 +201,13 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'נכשל באתחול המודל עם ${_currentBackend.name.toUpperCase()}: $e';
+          _error =
+              'נכשל באתחול המודל עם ${_currentBackend.name.toUpperCase()}: $e';
           _isModelInitialized = false;
           _isInitializing = false;
         });
       }
     }
-  }
-
-  Future<void> _switchModel(Model newModel, PreferredBackend? newBackend) async {
-    if (newModel == _currentModel && (newBackend ?? _currentBackend) == _currentBackend) {
-      return;
-    }
-
-    setState(() {
-      _currentModel = newModel;
-      _currentBackend = newBackend ?? _currentBackend;
-      _useGPU = _currentBackend == PreferredBackend.gpu;
-    });
-
-    await _initializeModel();
-  }
-
-  Future<void> _toggleBackend() async {
-    final newBackend = _useGPU ? PreferredBackend.cpu : PreferredBackend.gpu;
-
-    setState(() {
-      _useGPU = !_useGPU;
-      _currentBackend = newBackend;
-      _isModelInitialized = false;
-      _error = null;
-    });
-
-    await _initializeModel();
-  }
-
-  void _clearConversation() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.backgroundWhite,
-          title: const Text(
-            'ניקוי שיחה',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
-          content: const Text(
-            'האם את/ה בטוח/ה שברצונך לנקות את השיחה? פעולה זו לא ניתנת לביטול.',
-            style: TextStyle(color: AppColors.textTertiary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'ביטול',
-                style: TextStyle(color: AppColors.textGrey),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await _chatService.deleteChat(_currentChat!.id);
-                _currentChat = await _chatService.createNewChat(
-                  title: 'New Chat',
-                  modelName: _currentModel.displayName,
-                );
-                setState(() {
-                  _error = null;
-                  _isStreaming = false;
-                });
-              },
-              child: const Text(
-                'ניקוי',
-                style: TextStyle(color: AppColors.error),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> _handleMessageFromLanding(Message message) async {
@@ -283,7 +218,8 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('הגעת למגבלה של 10 שיחות. מחק שיחה כדי ליצור חדשה.'),
+              content:
+                  Text('הגעת למגבלה של 10 שיחות. מחק שיחה כדי ליצור חדשה.'),
               backgroundColor: AppColors.warning,
               duration: Duration(seconds: 3),
             ),
@@ -378,13 +314,13 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
         setState(() {
           _error = e.toString();
         });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: AppColors.error,
-              duration: const Duration(seconds: 3),
-            ),
-          );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -428,48 +364,33 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   }
 
   Future<void> _handleChatDeleted(String chatId) async {
-    // If the deleted chat was the current chat, create a new one to keep app ready
-    if (_currentChat?.id == chatId) {
-      try {
-        // Check chat limit
-        if (_chatService.chats.length < 10) {
-          // Create new chat automatically (no context reload needed for new empty chat)
-          _currentChat = await _chatService.createNewChatWithSmartNaming(
-            modelName: _currentModel.displayName,
-          );
+    final hasChats = _chatService.chats.isNotEmpty;
+    final nextChat = _chatService.currentChat;
 
-          if (mounted) {
-            setState(() {
-              _error = null;
-              _isStreaming = false;
-            });
-          }
-        } else {
-          // At limit, just clear current chat
+    if (!hasChats || nextChat == null) {
+      if (mounted) {
+        setState(() {
           _currentChat = null;
-          if (mounted) {
-            setState(() {
-              _error = null;
-              _isStreaming = false;
-            });
-          }
-        }
-      } catch (e) {
-        // If creation fails, just clear current chat
-        _currentChat = null;
-        if (mounted) {
-          setState(() {
-            _error = e.toString();
-            _isStreaming = false;
-          });
-        }
+          chat = null;
+          _error = null;
+          _isStreaming = false;
+        });
       }
-    } else {
-      setState(() {
-        _error = null;
-        _isStreaming = false;
-      });
+      return;
     }
+
+    if (nextChat.id == _currentChat?.id) {
+      if (mounted) {
+        setState(() {
+          _currentChat = nextChat;
+          _error = null;
+          _isStreaming = false;
+        });
+      }
+      return;
+    }
+
+    await _switchToChat(nextChat.id);
   }
 
   Future<void> _updateChatTitleFromMessage(String messageText) async {
@@ -544,7 +465,9 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
       title = cleanMessage.substring(0, sentenceEnd);
     } else {
       // If no sentence end found, take first 30 characters
-      title = cleanMessage.length > 30 ? cleanMessage.substring(0, 30) + '...' : cleanMessage;
+      title = cleanMessage.length > 30
+          ? cleanMessage.substring(0, 30) + '...'
+          : cleanMessage;
     }
 
     // Remove common prefixes that don't add value
@@ -605,11 +528,13 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
       // Step 2: Set model path
       Logger.context('Reloading model...');
       final path = _currentModel.url;
-      await _performModelOperation(() => _gemma.modelManager.setModelPath(path));
+      await _performModelOperation(
+          () => _gemma.modelManager.setModelPath(path));
       Logger.context('Model path set');
 
       // Step 3: Create new model instance (this is the heaviest operation)
-      Logger.context('Creating new model instance (TensorFlow Lite optimization in progress)...');
+      Logger.context(
+          'Creating new model instance (TensorFlow Lite optimization in progress)...');
       final model = await _performModelOperation(() => _gemma.createModel(
             modelType: _currentModel.modelType,
             preferredBackend: _currentBackend,
@@ -636,7 +561,8 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
 
       // Step 5: Rebuild context by replaying messages
       if (_currentChat != null && _currentChat!.messages.isNotEmpty) {
-        Logger.context('Rebuilding context with ${_currentChat!.messages.length} messages...');
+        Logger.context(
+            'Rebuilding context with ${_currentChat!.messages.length} messages...');
         await _replayMessages(_currentChat!.messages);
         Logger.context('Context rebuilt successfully');
       }
@@ -692,42 +618,9 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
     }
   }
 
-  List<Model> _getAvailableModels() {
-    return Model.values.where((model) {
-      if (model.localModel) {
-        return kIsWeb;
-      }
-      if (!kIsWeb) return true;
-      return (model.preferredBackend == PreferredBackend.cpu || model.preferredBackend == PreferredBackend.gpu) &&
-          !model.needsAuth;
-    }).toList();
-  }
-
-  Future<List<Model>> _getExistingModels() async {
-    final availableModels = _getAvailableModels();
-    final existingModels = <Model>[];
-
-    for (final model in availableModels) {
-      try {
-        final downloadService = ModelDownloadService(
-          modelUrl: model.url,
-          modelFilename: model.filename,
-          licenseUrl: model.licenseUrl,
-        );
-        final exists = await downloadService.checkModelExistence();
-        if (exists) {
-          existingModels.add(model);
-        }
-      } catch (e) {
-        continue;
-      }
-    }
-
-    return existingModels;
-  }
-
   Future<void> _handleFunctionCall(FunctionCallResponse functionCall) async {
-    debugPrint('Function call received: ${functionCall.name}(${functionCall.args})');
+    debugPrint(
+        'Function call received: ${functionCall.name}(${functionCall.args})');
 
     setState(() {
       _isStreaming = true;
@@ -996,7 +889,9 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
               ])
             : Column(children: [
                 if (_error != null) _buildErrorBanner(_error!),
-                if (chat?.supportsImages == true && _currentChat?.messages.isEmpty == true) _buildImageSupportInfo(),
+                if (chat?.supportsImages == true &&
+                    _currentChat?.messages.isEmpty == true)
+                  _buildImageSupportInfo(),
                 Expanded(
                   child: ChatListWidget(
                     key: ValueKey(_currentChat?.id ?? 'no-chat'),
