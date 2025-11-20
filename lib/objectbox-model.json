@@ -1,0 +1,117 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:2620992702104245020",
+      "lastPropertyId": "7:4346105652626259248",
+      "name": "ChatEntity",
+      "properties": [
+        {
+          "id": "1:7168823626345510443",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4863890609776543170",
+          "name": "chatId",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "1:7833960886217313730"
+        },
+        {
+          "id": "3:3109424375274105055",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:7044240463681678279",
+          "name": "modelName",
+          "type": 9
+        },
+        {
+          "id": "5:5499881027168933445",
+          "name": "createdAt",
+          "type": 12
+        },
+        {
+          "id": "6:6475045447486182352",
+          "name": "updatedAt",
+          "type": 12
+        },
+        {
+          "id": "7:4346105652626259248",
+          "name": "messagesJson",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:930152354224104578",
+      "lastPropertyId": "2:2037545947080077728",
+      "name": "ChatStateEntity",
+      "properties": [
+        {
+          "id": "1:4305268310587395401",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2037545947080077728",
+          "name": "currentChatId",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:1224459466577265631",
+      "lastPropertyId": "5:553142596752699985",
+      "name": "RatingEntity",
+      "properties": [
+        {
+          "id": "1:5791139195572041865",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5580827946614379911",
+          "name": "score",
+          "type": 8
+        },
+        {
+          "id": "3:5680249508936305382",
+          "name": "comment",
+          "type": 9
+        },
+        {
+          "id": "4:2230755663432000876",
+          "name": "rater",
+          "type": 9
+        },
+        {
+          "id": "5:553142596752699985",
+          "name": "date",
+          "type": 10
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "3:1224459466577265631",
+  "lastIndexId": "1:7833960886217313730",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
