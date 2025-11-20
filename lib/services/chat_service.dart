@@ -1,6 +1,7 @@
 import 'package:mobigpt/models/chat.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:mobigpt/repositories/chat_repository.dart';
+import 'package:mobigpt/services/model_session_service.dart';
 import 'package:mobigpt/utils/logger.dart';
 
 /// Service to manage multiple chat sessions
@@ -9,6 +10,7 @@ class ChatService {
       : _chatRepository = chatRepository;
 
   final ChatRepository _chatRepository;
+  final ModelSessionService _modelSessionService = ModelSessionService.instance;
 
   List<Chat> _chats = [];
   String? _currentChatId;
@@ -32,7 +34,7 @@ class ChatService {
 
   /// Initialize the service and load saved chats
   Future<void> initialize() async {
-    _chats = await _chatRepository.getAllChats();
+    _chats = List.from(await _chatRepository.getAllChats());
     _currentChatId = await _chatRepository.getCurrentChatId();
 
     if (_currentChatId != null &&
@@ -205,15 +207,21 @@ class ChatService {
 
   /// Delete a chat
   Future<void> deleteChat(String chatId) async {
-    _chats.removeWhere((chat) => chat.id == chatId);
+    final removedIndex = _chats.indexWhere((chat) => chat.id == chatId);
+    await _chatRepository.deleteChat(chatId);
+    await _modelSessionService.disposeSession(chatId);
 
-    // If we deleted the current chat, switch to the first available chat
+    if (removedIndex == -1) {
+      return;
+    }
+
+    _chats.removeAt(removedIndex);
+    _resortChats();
+
     if (_currentChatId == chatId) {
       _currentChatId = _chats.isNotEmpty ? _chats.first.id : null;
       await _chatRepository.setCurrentChatId(_currentChatId);
     }
-
-    await _chatRepository.deleteChat(chatId);
   }
 
   /// Clear all chats

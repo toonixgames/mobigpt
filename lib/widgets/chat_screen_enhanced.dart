@@ -207,7 +207,6 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
     }
   }
 
-
   Future<void> _handleMessageFromLanding(Message message) async {
     // Chat should already exist from startup, but handle edge case
     if (_currentChat == null) {
@@ -362,48 +361,33 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   }
 
   Future<void> _handleChatDeleted(String chatId) async {
-    // If the deleted chat was the current chat, create a new one to keep app ready
-    if (_currentChat?.id == chatId) {
-      try {
-        // Check chat limit
-        if (_chatService.chats.length < 10) {
-          // Create new chat automatically (no context reload needed for new empty chat)
-          _currentChat = await _chatService.createNewChatWithSmartNaming(
-            modelName: _currentModel.displayName,
-          );
+    final hasChats = _chatService.chats.isNotEmpty;
+    final nextChat = _chatService.currentChat;
 
-          if (mounted) {
-            setState(() {
-              _error = null;
-              _isStreaming = false;
-            });
-          }
-        } else {
-          // At limit, just clear current chat
+    if (!hasChats || nextChat == null) {
+      if (mounted) {
+        setState(() {
           _currentChat = null;
-          if (mounted) {
-            setState(() {
-              _error = null;
-              _isStreaming = false;
-            });
-          }
-        }
-      } catch (e) {
-        // If creation fails, just clear current chat
-        _currentChat = null;
-        if (mounted) {
-          setState(() {
-            _error = e.toString();
-            _isStreaming = false;
-          });
-        }
+          chat = null;
+          _error = null;
+          _isStreaming = false;
+        });
       }
-    } else {
-      setState(() {
-        _error = null;
-        _isStreaming = false;
-      });
+      return;
     }
+
+    if (nextChat.id == _currentChat?.id) {
+      if (mounted) {
+        setState(() {
+          _currentChat = nextChat;
+          _error = null;
+          _isStreaming = false;
+        });
+      }
+      return;
+    }
+
+    await _switchToChat(nextChat.id);
   }
 
   Future<void> _updateChatTitleFromMessage(String messageText) async {
@@ -630,7 +614,6 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
       }
     }
   }
-
 
   Future<void> _handleFunctionCall(FunctionCallResponse functionCall) async {
     debugPrint(
