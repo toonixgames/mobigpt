@@ -9,17 +9,23 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:mobigpt/objectbox.g.dart';
 
+import '../../repositories/objectbox_rating_repository.dart';
+import '../../repositories/rating_repository.dart';
+import '../entities/rating_entity.dart';
+
 class ObjectBoxStore {
   ObjectBoxStore._(this.store)
       : chatRepository = ObjectBoxChatRepository(
           store.box<ChatEntity>(),
           store.box<ChatStateEntity>(),
-        );
+        ),
+        ratingRepository = ObjectBoxRatingRepository(store.box<RatingEntity>());
 
   static ObjectBoxStore? _instance;
 
   final Store store;
   final ChatRepository chatRepository;
+  final RatingRepository ratingRepository;
   Admin? _admin;
 
   static Future<ObjectBoxStore> init() async {

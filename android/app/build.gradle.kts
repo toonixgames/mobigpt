@@ -5,6 +5,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+configurations {
+    named("debugImplementation") {
+        exclude(group = "io.objectbox", module = "objectbox-android")
+    }
+}
+
 android {
     namespace = "com.example.mobigpt"
     compileSdk = flutter.compileSdkVersion
@@ -42,6 +48,11 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+
+    dependencies {
+        // your existing deps...
+        debugImplementation("io.objectbox:objectbox-android-objectbrowser:4.0.3")
     }
 }
 

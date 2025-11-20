@@ -15,49 +15,50 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'data/entities/chat_entity.dart';
+import 'data/entities/rating_entity.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(1, 4543613043046791823),
+      id: const obx_int.IdUid(1, 2620992702104245020),
       name: 'ChatEntity',
-      lastPropertyId: const obx_int.IdUid(7, 6583014420374632350),
+      lastPropertyId: const obx_int.IdUid(7, 4346105652626259248),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 3192336828943901096),
+            id: const obx_int.IdUid(1, 7168823626345510443),
             name: 'id',
             type: 6,
             flags: 1),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 4807982042951198554),
+            id: const obx_int.IdUid(2, 4863890609776543170),
             name: 'chatId',
             type: 9,
             flags: 2080,
-            indexId: const obx_int.IdUid(1, 2425042545643712187)),
+            indexId: const obx_int.IdUid(1, 7833960886217313730)),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 3268695390793612168),
+            id: const obx_int.IdUid(3, 3109424375274105055),
             name: 'title',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 3458017473412672444),
+            id: const obx_int.IdUid(4, 7044240463681678279),
             name: 'modelName',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 2586569296914608986),
+            id: const obx_int.IdUid(5, 5499881027168933445),
             name: 'createdAt',
             type: 12,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 5758590277604000490),
+            id: const obx_int.IdUid(6, 6475045447486182352),
             name: 'updatedAt',
             type: 12,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 6583014420374632350),
+            id: const obx_int.IdUid(7, 4346105652626259248),
             name: 'messagesJson',
             type: 9,
             flags: 0)
@@ -65,20 +66,54 @@ final _entities = <obx_int.ModelEntity>[
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(2, 8184883551584610521),
+      id: const obx_int.IdUid(2, 930152354224104578),
       name: 'ChatStateEntity',
-      lastPropertyId: const obx_int.IdUid(2, 2531892017498987595),
+      lastPropertyId: const obx_int.IdUid(2, 2037545947080077728),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 3191883032647829038),
+            id: const obx_int.IdUid(1, 4305268310587395401),
             name: 'id',
             type: 6,
             flags: 129),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 2531892017498987595),
+            id: const obx_int.IdUid(2, 2037545947080077728),
             name: 'currentChatId',
             type: 9,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(3, 1224459466577265631),
+      name: 'RatingEntity',
+      lastPropertyId: const obx_int.IdUid(5, 553142596752699985),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 5791139195572041865),
+            name: 'id',
+            type: 6,
+            flags: 129),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 5580827946614379911),
+            name: 'score',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 5680249508936305382),
+            name: 'comment',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 2230755663432000876),
+            name: 'rater',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 553142596752699985),
+            name: 'date',
+            type: 10,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -120,8 +155,8 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(2, 8184883551584610521),
-      lastIndexId: const obx_int.IdUid(1, 2425042545643712187),
+      lastEntityId: const obx_int.IdUid(3, 1224459466577265631),
+      lastIndexId: const obx_int.IdUid(1, 7833960886217313730),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
@@ -222,6 +257,43 @@ obx_int.ModelDefinition getObjectBoxModel() {
               ChatStateEntity(id: idParam, currentChatId: currentChatIdParam);
 
           return object;
+        }),
+    RatingEntity: obx_int.EntityDefinition<RatingEntity>(
+        model: _entities[2],
+        toOneRelations: (RatingEntity object) => [],
+        toManyRelations: (RatingEntity object) => {},
+        getId: (RatingEntity object) => object.id,
+        setId: (RatingEntity object, int id) {
+          object.id = id;
+        },
+        objectToFB: (RatingEntity object, fb.Builder fbb) {
+          final commentOffset = fbb.writeString(object.comment);
+          final raterOffset = fbb.writeString(object.rater);
+          fbb.startTable(6);
+          fbb.addInt64(0, object.id);
+          fbb.addFloat64(1, object.score);
+          fbb.addOffset(2, commentOffset);
+          fbb.addOffset(3, raterOffset);
+          fbb.addInt64(4, object.date.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final scoreParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 6, 0);
+          final commentParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 8, '');
+          final raterParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 10, '');
+          final object = RatingEntity(
+              score: scoreParam, comment: commentParam, rater: raterParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0)
+            ..date = DateTime.fromMillisecondsSinceEpoch(
+                const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0));
+
+          return object;
         })
   };
 
@@ -268,4 +340,27 @@ class ChatStateEntity_ {
   /// See [ChatStateEntity.currentChatId].
   static final currentChatId =
       obx.QueryStringProperty<ChatStateEntity>(_entities[1].properties[1]);
+}
+
+/// [RatingEntity] entity fields to define ObjectBox queries.
+class RatingEntity_ {
+  /// See [RatingEntity.id].
+  static final id =
+      obx.QueryIntegerProperty<RatingEntity>(_entities[2].properties[0]);
+
+  /// See [RatingEntity.score].
+  static final score =
+      obx.QueryDoubleProperty<RatingEntity>(_entities[2].properties[1]);
+
+  /// See [RatingEntity.comment].
+  static final comment =
+      obx.QueryStringProperty<RatingEntity>(_entities[2].properties[2]);
+
+  /// See [RatingEntity.rater].
+  static final rater =
+      obx.QueryStringProperty<RatingEntity>(_entities[2].properties[3]);
+
+  /// See [RatingEntity.date].
+  static final date =
+      obx.QueryDateProperty<RatingEntity>(_entities[2].properties[4]);
 }

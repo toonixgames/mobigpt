@@ -49,6 +49,11 @@ class Logger {
   static void chatService(String message) {
     info(message, tag: 'ChatService');
   }
+
+  /// Log chat service operations
+  static void ratingService(String message) {
+    info(message, tag: 'RatingService');
+  }
   
   /// Log chat screen operations
   static void chatScreen(String message) {

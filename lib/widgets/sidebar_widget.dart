@@ -3,8 +3,11 @@ import 'package:mobigpt/models/chat.dart';
 import 'package:mobigpt/services/chat_service.dart';
 import 'package:mobigpt/theme/appColors.dart';
 
+import '../services/rating_service.dart';
+
 class SidebarWidget extends StatelessWidget {
   final ChatService chatService;
+  final RatingService ratingService;
   final String? currentChatId;
   final Function(String chatId) onChatSelected;
   final Function(String chatId) onChatDeleted;
@@ -14,6 +17,7 @@ class SidebarWidget extends StatelessWidget {
   const SidebarWidget({
     super.key,
     required this.chatService,
+    required this.ratingService,
     required this.currentChatId,
     required this.onChatSelected,
     required this.onChatDeleted,
@@ -156,6 +160,42 @@ class SidebarWidget extends StatelessWidget {
                     },
                   ),
           ),
+
+          // Rate button
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () { ratingService.showRatingDialog(context); },
+                icon: const Icon(
+                  Icons.star_border,
+                  color: AppColors.lightPrimary,
+                  size: 20,
+                ),
+                label: const Text(
+                  'Rate the App',
+                  style: TextStyle(
+                    color: AppColors.lightPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.backgroundWhite,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  elevation: 0,
+                  side: const BorderSide(
+                    color: AppColors.lightPrimary,
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
