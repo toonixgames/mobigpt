@@ -244,6 +244,18 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
     if (_currentChat != null) {
       final isFirstMessage = _currentChat!.messages.isEmpty;
 
+      // If this is the first message and chat context is not initialized, initialize it now
+      // This is needed when creating a new chat after deleting the last one
+      if (isFirstMessage && chat == null) {
+        await _reloadChatContext();
+        // Update state after chat context is initialized so UI can switch to chat view
+        if (mounted) {
+          setState(() {
+            _isModelInitialized = true;
+          });
+        }
+      }
+
       setState(() {
         _error = null;
         _currentChat = _currentChat!.addMessage(message);
@@ -361,33 +373,59 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
   }
 
   Future<void> _handleChatDeleted(String chatId) async {
-    final hasChats = _chatService.chats.isNotEmpty;
-    final nextChat = _chatService.currentChat;
+    final wasCurrentChat = _currentChat?.id == chatId;
+    final remainingChats = _chatService.chats;
 
-    if (!hasChats || nextChat == null) {
+    // If deleting the current chat
+    if (wasCurrentChat) {
+      // If there are other chats, switch to the first one (sidebar stays open)
+      if (remainingChats.isNotEmpty) {
+        final nextChat = remainingChats.first;
+        await _switchToChat(nextChat.id);
+        return;
+      }
+
+      // If this was the last chat, close sidebar and create new chat
+      if (mounted) {
+        Navigator.of(context).pop(); // Close sidebar
+      }
+
+      try {
+        // Create new chat
+        _currentChat = await _chatService.createNewChatWithSmartNaming(
+          modelName: _currentModel.displayName,
+        );
+
+        // Don't reload context for new empty chat - it will be created when user sends first message
+        // This ensures the landing view is shown correctly
+
+        if (mounted) {
+          setState(() {
+            _error = null;
+            _isStreaming = false;
+            _isModelInitialized = true;
+            chat = null; // Clear chat to show landing view
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _error = e.toString();
+            _currentChat = null;
+            chat = null;
+            _isStreaming = false;
+          });
+        }
+      }
+    } else {
+      // Deleting a different chat - just update state (sidebar stays open)
       if (mounted) {
         setState(() {
-          _currentChat = null;
-          chat = null;
           _error = null;
           _isStreaming = false;
         });
       }
-      return;
     }
-
-    if (nextChat.id == _currentChat?.id) {
-      if (mounted) {
-        setState(() {
-          _currentChat = nextChat;
-          _error = null;
-          _isStreaming = false;
-        });
-      }
-      return;
-    }
-
-    await _switchToChat(nextChat.id);
   }
 
   Future<void> _updateChatTitleFromMessage(String messageText) async {
@@ -855,9 +893,11 @@ class ChatScreenEnhancedState extends State<ChatScreenEnhanced> {
         },
       ),
       body: Stack(children: [
-        // Show landing view when chat is empty (no messages yet)
+        // Show landing view when chat is empty (no messages yet) or chat context is not initialized
         // Always show input field - model initialization happens in background
-        (_currentChat == null || (_currentChat?.messages.isEmpty ?? true))
+        (_currentChat == null ||
+                (_currentChat?.messages.isEmpty ?? true) ||
+                chat == null)
             ? Column(children: [
                 if (_error != null) _buildErrorBanner(_error!),
                 Expanded(

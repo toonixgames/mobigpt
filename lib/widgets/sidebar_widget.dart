@@ -325,7 +325,6 @@ class SidebarWidget extends StatelessWidget {
               Navigator.of(context).pop();
               await chatService.deleteChat(chat.id);
               onChatDeleted(chat.id);
-              onClose();
             },
             child: const Text(
               'מחק',
