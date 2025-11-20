@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gemma/pigeon.g.dart';
-import 'package:mobigpt/widgets/chat_screen_enhanced.dart';
+import 'package:mobigpt/data/objectbox/objectbox_store.dart';
 import 'package:mobigpt/models/model.dart';
+import 'package:mobigpt/services/chat_service.dart';
 import 'package:mobigpt/services/model_download_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobigpt/utils/logger.dart';
+import 'package:mobigpt/widgets/chat_screen_enhanced.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +16,12 @@ void main() async {
   // Request storage permissions at app startup
   await _requestStoragePermissions();
 
-  runApp(const ChatApp());
+  final objectBoxStore = await ObjectBoxStore.init();
+  final chatService = ChatService(
+    chatRepository: objectBoxStore.chatRepository,
+  );
+
+  runApp(ChatApp(chatService: chatService));
 }
 
 // Request storage permissions for external storage access
@@ -27,16 +34,20 @@ Future<void> _requestStoragePermissions() async {
     Logger.info('Storage permission status: $storageStatus');
 
     // Request manage external storage permission (for Android 11+)
-    final manageStorageStatus = await Permission.manageExternalStorage.request();
-    Logger.info('Manage external storage permission status: $manageStorageStatus');
+    final manageStorageStatus =
+        await Permission.manageExternalStorage.request();
+    Logger.info(
+        'Manage external storage permission status: $manageStorageStatus');
 
     // Check if we have any storage permissions
-    final hasStoragePermission = storageStatus.isGranted || manageStorageStatus.isGranted;
+    final hasStoragePermission =
+        storageStatus.isGranted || manageStorageStatus.isGranted;
 
     if (hasStoragePermission) {
       Logger.info('Storage permissions granted successfully');
     } else {
-      Logger.warning('Storage permissions denied - some features may not work properly');
+      Logger.warning(
+          'Storage permissions denied - some features may not work properly');
     }
   } catch (e) {
     Logger.error('Failed to request storage permissions: $e');
@@ -44,12 +55,12 @@ Future<void> _requestStoragePermissions() async {
 }
 
 class ChatApp extends StatelessWidget {
+  const ChatApp({super.key, required this.chatService});
 
-  const ChatApp({super.key});
+  final ChatService chatService;
 
   // Get the first available model based on platform and existence check
   Future<Model> _getFirstAvailableModel() async {
-
     var models = Model.values.where((model) {
       if (model.localModel) {
         return kIsWeb;
@@ -119,6 +130,7 @@ class ChatApp extends StatelessWidget {
                 textDirection: TextDirection.rtl,
                 child: ChatScreenEnhanced(
                   model: snapshot.data!,
+                  chatService: chatService,
                 ),
               );
             } else {

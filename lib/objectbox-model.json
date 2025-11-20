@@ -1,0 +1,83 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:4543613043046791823",
+      "lastPropertyId": "7:6583014420374632350",
+      "name": "ChatEntity",
+      "properties": [
+        {
+          "id": "1:3192336828943901096",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4807982042951198554",
+          "name": "chatId",
+          "type": 9,
+          "flags": 2080,
+          "indexId": "1:2425042545643712187"
+        },
+        {
+          "id": "3:3268695390793612168",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:3458017473412672444",
+          "name": "modelName",
+          "type": 9
+        },
+        {
+          "id": "5:2586569296914608986",
+          "name": "createdAt",
+          "type": 12
+        },
+        {
+          "id": "6:5758590277604000490",
+          "name": "updatedAt",
+          "type": 12
+        },
+        {
+          "id": "7:6583014420374632350",
+          "name": "messagesJson",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:8184883551584610521",
+      "lastPropertyId": "2:2531892017498987595",
+      "name": "ChatStateEntity",
+      "properties": [
+        {
+          "id": "1:3191883032647829038",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:2531892017498987595",
+          "name": "currentChatId",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:8184883551584610521",
+  "lastIndexId": "1:2425042545643712187",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

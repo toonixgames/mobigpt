@@ -71,7 +71,7 @@ class Chat {
   String get lastMessagePreview {
     final last = lastMessage;
     if (last == null) return 'No messages yet';
-    
+
     final text = last.text;
     if (text.length <= 50) return text;
     return '${text.substring(0, 50)}...';
@@ -87,7 +87,7 @@ class Chat {
     return {
       'id': id,
       'title': title,
-      'messages': messages.map((m) => _messageToJson(m)).toList(),
+      'messages': messages.map((m) => messageToJson(m)).toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'modelName': modelName,
@@ -100,7 +100,7 @@ class Chat {
       id: json['id'] as String,
       title: json['title'] as String,
       messages: (json['messages'] as List)
-          .map((m) => _messageFromJson(m as Map<String, dynamic>))
+          .map((m) => messageFromJson(m as Map<String, dynamic>))
           .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -109,7 +109,7 @@ class Chat {
   }
 
   /// Convert Message to JSON
-  static Map<String, dynamic> _messageToJson(Message message) {
+  static Map<String, dynamic> messageToJson(Message message) {
     return {
       'text': message.text,
       'isUser': message.isUser,
@@ -118,12 +118,12 @@ class Chat {
   }
 
   /// Create Message from JSON
-  static Message _messageFromJson(Map<String, dynamic> json) {
+  static Message messageFromJson(Map<String, dynamic> json) {
     final type = MessageType.values.firstWhere(
       (e) => e.name == json['type'],
       orElse: () => MessageType.text,
     );
-    
+
     return Message(
       text: json['text'] as String,
       isUser: json['isUser'] as bool,
